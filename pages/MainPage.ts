@@ -1,4 +1,4 @@
-import { type Locator, type Page } from '@playwright/test';
+import { type Locator, type Page, expect } from '@playwright/test';
 
 export class MainPage {
   readonly page: Page;
@@ -10,22 +10,31 @@ export class MainPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.cookieButton = page.getByText(/^Принять$/);
+    this.cookieButton = page.getByRole('button', { name: 'Принять' });
     this.callWidgetButton = page.locator('div.call-open').first();
     this.callPopup = page.locator('div.call-pop');
-    this.phoneInput = page.locator('div.call_me').locator('input[type=phone]');
-    this.closeCallPopupButton = page.locator('div.call-close');
+    this.phoneInput = this.callPopup.locator('input[type="tel"], input[type="phone"]');
+    this.closeCallPopupButton = this.callPopup.locator('.call-close');
   }
 
   async goto() {
     await this.page.goto('/');
   }
-
   async acceptCookies() {
-    await this.cookieButton.click();
+    if (await this.cookieButton.isVisible()) {
+      await this.cookieButton.click();
+    }
   }
-
   async openCallWidget() {
     await this.callWidgetButton.click();
+    await expect(this.callPopup).toBeVisible(); 
+  }
+  async fillCallbackPhone(phone: string) {
+    await this.phoneInput.fill(phone);
+  }
+
+  async closeCallPopup() {
+    await this.closeCallPopupButton.click();
+    await expect(this.callPopup).toBeHidden();
   }
 }

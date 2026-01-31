@@ -10,18 +10,24 @@ export class ProductDetailPage {
     this.productTitle = page.locator('h1');
     this.productPrice = page.locator('span.price.big');
   }
-
-  
+  async getTitle(): Promise<string> {
+    const text = await this.productTitle.textContent();
+    return text?.split(',')[0].trim() || '';
+  }
+  async getPack(): Promise<string> {
+    const text = await this.productTitle.textContent();
+    const parts = text?.split(',') || [];
+    return parts.length > 1 ? parts.slice(1).join(',').trim() : '';
+  }
+  async getPrice(): Promise<string> {
+    const price = await this.productPrice.textContent();
+    return price?.trim() || '';
+  }
   async getProductData() {
-    const fullTitleText = await this.productTitle.innerText();
-    const priceText = await this.productPrice.innerText();
-
-    const titleParts = fullTitleText.split(',');
-    
     return {
-      title: titleParts[0].trim(),
-      price: priceText.trim(),
-      pack: titleParts.slice(1).join(',').trim()
+      title: await this.getTitle(),
+      price: await this.getPrice(),
+      pack: await this.getPack()
     };
   }
 }

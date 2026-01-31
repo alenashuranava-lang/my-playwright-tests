@@ -2,42 +2,45 @@ import { Page, Locator } from '@playwright/test';
 
 export class CatalogPage {
     readonly page: Page;
-    // Обязательно объявляем productTitles, чтобы исправить ошибку на скриншоте
     readonly productTitles: Locator;
+    readonly productCard: Locator;
 
     constructor(page: Page) {
         this.page = page;
-        this.productTitles = page.locator('.product__title'); // используйте ваш селектор заголовков
+        this.productTitles = page.locator('.product__title');
+        this.productCard = page.locator('.product-item'); 
+    }
+    private getFilterLabel(title: string): Locator {
+        return this.page.locator(`label[title="${title}"]`);
     }
 
-    // Добавляем метод для перехода на страницу
     async goToDryCatFood() {
         await this.page.goto('https://e-zoo.by/catalog/koshki/korm/sukhoy-korm/');
     }
-
-    // Исправляем ошибку filterByRoyalCanin
     async filterByRoyalCanin() {
-        await this.page.locator('label[title="Royal Canin"]').click();
+        await this.selectBrand('Royal Canin');
     }
 
-    // Эти методы нужны для вашего нового теста
     async selectBrand(brand: string) {
-        await this.page.locator(`label[title="${brand}"]`).click();
+        await this.getFilterLabel(brand).click();
     }
 
     async selectWeight(weight: string) {
-        await this.page.locator(`label[title="${weight}"]`).click();
+        await this.getFilterLabel(weight).click();
     }
-
     async getProductData(productName: string) {
-        const card = this.page.locator('.product__details', { hasText: productName }).locator('..');
-        const priceRaw = await card.locator('.price-block').innerText();
-        const packRaw = await card.locator('p.fasovka').innerText();
+        const card = this.productCard.filter({ hasText: productName });
+        const priceLocator = card.locator('.price-block');
+        const packLocator = card.locator('p.fasovka');
+        const addToCartButton = card.locator('button:has-text("В корзину")');
+
+        const priceRaw = await priceLocator.innerText();
+        const packRaw = await packLocator.innerText();
 
         return {
             price: priceRaw.trim().split(' ')[0],
-            pack: packRaw.split(':')[1].trim(),
-            addToCartButton: card.locator('button:has-text("В корзину")')
+            pack: packRaw.split(':')[1]?.trim() || '',
+            addToCartButton: addToCartButton
         };
     }
 }
