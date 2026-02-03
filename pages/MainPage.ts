@@ -1,4 +1,4 @@
-import { type Locator, type Page, expect } from '@playwright/test';
+import { type Locator, type Page, expect } from '@playwright/test'; //зачем здесь type?
 
 export class MainPage {
   readonly page: Page;
@@ -17,15 +17,15 @@ export class MainPage {
     this.closeCallPopupButton = this.callPopup.locator('.call-close');
   }
 
-  async goto() {
+  async goto() { //лучше переименоватьв  open
     await this.page.goto('/');
   }
   async acceptCookies() {
-    if (await this.cookieButton.isVisible()) {
+    if (await this.cookieButton.isVisible()) { // неудачная реализация, потому что тест завалится если кнопка кук будет показана с опозданием
       await this.cookieButton.click();
     }
   }
-  async openCallWidget() {
+  async openCallWidget() { // этот и последующие методы лучше обьединить в один метод 
     await this.callWidgetButton.click();
     await expect(this.callPopup).toBeVisible(); 
   }

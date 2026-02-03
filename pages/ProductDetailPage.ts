@@ -9,7 +9,7 @@ export class ProductDetailPage {
     this.page = page;
     this.productTitle = page.locator('h1');
     this.productPrice = page.locator('span.price.big');
-  }
+  }  // между блоками должна быть пустая строка
   async getTitle(): Promise<string> {
     const text = await this.productTitle.textContent();
     return text?.split(',')[0].trim() || '';
@@ -23,7 +23,7 @@ export class ProductDetailPage {
     const price = await this.productPrice.textContent();
     return price?.trim() || '';
   }
-  async getProductData() {
+  async getProductData() { // добавь возвращаемый результат
     return {
       title: await this.getTitle(),
       price: await this.getPrice(),

@@ -10,7 +10,7 @@ export class CartPage {
         this.firstItemContainer = page.locator('.product-basket').first();
         this.firstItemPrice = this.firstItemContainer.locator('.product-basket__price-total');
         this.firstItemTitle = this.firstItemContainer.locator('h4 a');
-    }
+    }  //должна быть пробельная строка между блоками кода
     async getFirstItemPrice(): Promise<string> {
         const text = await this.firstItemPrice.innerText();
         return text.trim().split(' ')[0];
@@ -19,7 +19,7 @@ export class CartPage {
         const text = await this.firstItemTitle.innerText();
         return text.split(',').slice(1).join(',').trim();
     }
-    async getFirstItemData() {
+    async getFirstItemData() {  //добавить возвращаемый результат
         return {
             price: await this.getFirstItemPrice(),
             pack: await this.getFirstItemPack()
