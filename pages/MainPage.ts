@@ -20,12 +20,12 @@ export class MainPage {
   async goto() { //лучше переименоватьв  open
     await this.page.goto('/');
   }
-  async acceptCookies() {
+  async acceptCookies() {  /// перенести на бейс пейдж
     if (await this.cookieButton.isVisible()) { // неудачная реализация, потому что тест завалится если кнопка кук будет показана с опозданием
-      await this.cookieButton.click();
+      await this.cookieButton.click();// попробуй переделать на трай кетч с использованием .waitForVisible();
     }
   }
-  async openCallWidget() { // этот и последующие методы лучше обьединить в один метод 
+  async openCallWidget() { // вынести на бес пейдж
     await this.callWidgetButton.click();
     await expect(this.callPopup).toBeVisible(); 
   }
