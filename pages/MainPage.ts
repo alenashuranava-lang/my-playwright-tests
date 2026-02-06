@@ -1,34 +1,19 @@
-import { type Locator, type Page, expect } from '@playwright/test'; //зачем здесь type?
+import { Page, Locator, expect } from '@playwright/test'; //type убрала
+import { BasePage } from './BasePage';
+import { urls } from '../appConstants/appConstants';
 
-export class MainPage {
-  readonly page: Page;
-  readonly cookieButton: Locator;
-  readonly callWidgetButton: Locator;
-  readonly callPopup: Locator;
+export class MainPage extends BasePage {
   readonly phoneInput: Locator;
-  readonly closeCallPopupButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-    this.cookieButton = page.getByRole('button', { name: 'Принять' });
-    this.callWidgetButton = page.locator('div.call-open').first();
-    this.callPopup = page.locator('div.call-pop');
+    super(page); 
     this.phoneInput = this.callPopup.locator('input[type="tel"], input[type="phone"]');
-    this.closeCallPopupButton = this.callPopup.locator('.call-close');
   }
 
-  async goto() { //лучше переименоватьв  open
-    await this.page.goto('/');
+ async open() {
+    await this.openPageWithDirectUrl(urls.mainPage);
   }
-  async acceptCookies() {
-    if (await this.cookieButton.isVisible()) { // неудачная реализация, потому что тест завалится если кнопка кук будет показана с опозданием
-      await this.cookieButton.click();
-    }
-  }
-  async openCallWidget() { // этот и последующие методы лучше обьединить в один метод 
-    await this.callWidgetButton.click();
-    await expect(this.callPopup).toBeVisible(); 
-  }
+
   async fillCallbackPhone(phone: string) {
     await this.phoneInput.fill(phone);
   }
@@ -37,4 +22,4 @@ export class MainPage {
     await this.closeCallPopupButton.click();
     await expect(this.callPopup).toBeHidden();
   }
-}
+}//вынесла в бейз пэйдж go to ,cookies, openCallwidget

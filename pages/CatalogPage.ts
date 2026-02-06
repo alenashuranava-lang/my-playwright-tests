@@ -1,46 +1,37 @@
-import { Page, Locator } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
+import { BasePage } from './BasePage'; //basePage added
+import { testData, urls } from '../appConstants/appConstants';
 
-export class CatalogPage {
-    readonly page: Page;
-    readonly productTitles: Locator;//единственное число
-    readonly productCard: Locator;
+export class CatalogPage extends BasePage { //наследование
+  readonly productTitle: Locator; // ед число
+  readonly productCard: Locator;
 
-    constructor(page: Page) {
-        this.page = page;
-        this.productTitles = page.locator('.product__title');
-        this.productCard = page.locator('.product-item'); 
-    } // должна быть пробельная строка между блоками кода
-    private getFilterLabel(title: string): Locator {
-        return this.page.locator(`label[title="${title}"]`);
-    }
+  constructor(page: Page) {
+    super(page);
+    this.productTitle = page.locator('.product__title'); // ед число
+    this.productCard = page.locator('.product-item');
+  }//пробел добавоен
 
-    async goToDryCatFood() {
-        await this.page.goto('https://e-zoo.by/catalog/koshki/korm/sukhoy-korm/');
-    }
-    async filterByRoyalCanin() { // этот и следующий метод нужно слить в  один с параметром бренд
-        await this.selectBrand('Royal Canin');
-    }
+  async goToDryCatFood() {
+    await this.openPageWithDirectUrl(urls.catsDryFood); //доделала реальная сслыка лежит в appConstants.ts и BasePage
+  }
 
-    async selectBrand(brand: string) {
-        await this.getFilterLabel(brand).click();
-    }
+  // async filterByRoyalCanin(): Promise<void> {
+  //   await this.applyFilter(testData.brandRoyalCanin);//здесь не ругайся просто попробовала применить appConstants побольше
+  // }
+  async filterBy(parameter: string): Promise<void> { //+
+    await this.getFilterLabel(parameter).click();
+  }
 
-    async selectWeight(weight: string) {
-        await this.getFilterLabel(weight).click();
-    }
-    async getProductData(productName: string) { // добавить возвращаемый результат
-        const card = this.productCard.filter({ hasText: productName });
-        const priceLocator = card.locator('.price-block');
-        const packLocator = card.locator('p.fasovka');
-        const addToCartButton = card.locator('button:has-text("В корзину")');
+  async getProductData(productName: string): Promise<{ price: string; pack: string; addToCartButton: Locator }> {//добавлен рез
+    const card = this.productCard.filter({ hasText: productName });
+    const priceRaw = await card.locator('.price-block').innerText();
+    const packRaw = await card.locator('p.fasovka').innerText();
 
-        const priceRaw = await priceLocator.innerText();
-        const packRaw = await packLocator.innerText();
-
-        return {
-            price: priceRaw.trim().split(' ')[0],
-            pack: packRaw.split(':')[1]?.trim() || '',
-            addToCartButton: addToCartButton
-        };
-    }
+    return {
+      price: priceRaw.trim().split(' ')[0],
+      pack: packRaw.split(':')[1]?.trim() || '',
+      addToCartButton: card.locator('button:has-text("В корзину")')
+    };
+  }
 }
