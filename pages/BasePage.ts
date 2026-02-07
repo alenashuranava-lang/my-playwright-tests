@@ -6,7 +6,7 @@ export class BasePage {
   readonly callPopup: Locator;
   readonly closeCallPopupButton: Locator;
 
-  constructor(public readonly page: Page) {
+  constructor(public readonly page: Page) { //зачем здесь модификаторы?
     this.cookieButton = page.getByRole('button', { name: 'Принять' });
     this.callWidgetButton = page.locator('div.call-open').first();
     this.callPopup = page.locator('div.call-pop');
@@ -17,21 +17,21 @@ export class BasePage {
     await this.page.goto(url);
   }
 
-  async acceptCookies() { //trycatch
+  async acceptCookies() { 
     try {
-      await this.cookieButton.waitFor({ state: 'visible', timeout: 5000 });
+      await this.cookieButton.waitFor();
       await this.cookieButton.click();
     } catch (e) {
-      console.log('куки не появилась или не была нажата');
+      console.log('куки не появилась или не была нажата'); // что не была нажата? не куки а диалог ан принятие куки
     }
   }
 
-  async openCallWidget() { //звонок
+  async openCallWidget() {
     await this.callWidgetButton.click();
     await expect(this.callPopup).toBeVisible();
   }
 
-  protected getFilterLabel(title: string): Locator {
-    return this.page.locator(`label[title="${title}"]`);
+  protected getFilterLabel(title: string): Locator {  //почему этот метод здесь? у тебя фильтровать на любой странице можно?
+    return this.page.locator(`label[title="${title}"]`); // перенести в filterBy()
   }
 }

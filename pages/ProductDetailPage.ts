@@ -1,5 +1,5 @@
 import { Locator, Page } from '@playwright/test';
-import { BasePage } from './BasePage';//basePage
+import { BasePage } from './BasePage';
 
 export class ProductDetailPage extends BasePage {
   readonly productTitle: Locator;
@@ -27,7 +27,7 @@ export class ProductDetailPage extends BasePage {
     return price?.trim() || '';
   }
 
-  async getProductData(): Promise<{ title: string; price: string; pack: string }> {//есть возвр результат
+  async getProductData(): Promise<{ title: string; price: string; pack: string }> {
     return {
       title: await this.getTitle(),
       price: await this.getPrice(),
